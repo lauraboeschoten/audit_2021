@@ -46,7 +46,7 @@ prepareerRestricties <- function(extra, nweg, start, beschikbaar, type) {
     }
     
     # ondergrens en bovengrens weggelaten waarden per cel (alleen als start > 0)
-    if (aantalvast > 0) {
+    if (aantal0 > 0) {
       A3 <- cbind(matrix(0, nrow = K - aantal0, ncol = K - aantalvast), diag(K)[-idx0, -idx0])
       b3 <- rep(0, K - aantal0)
       A4 <- cbind(matrix(0, nrow = K - aantal0, ncol = K - aantalvast), -diag(K)[-idx0, -idx0])
