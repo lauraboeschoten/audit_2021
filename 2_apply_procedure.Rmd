@@ -82,7 +82,7 @@ for (s in 1:nrow(ex_nweg)) {
                               f              = berekenG2.type2,
                               grad           = berekenG2.grad.type2,
                               ui             = prepAb$A,
-                              ci             = prepAb$b - 1e-6,                  # error because of ui %*% theta - ci >= 0 
+                              ci             = prepAb$b, 
                               control        = list(maxit = 10000),
                               startaantallen = start,
                               beschikbaar    = beschikbaar,
