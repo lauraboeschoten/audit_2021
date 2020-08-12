@@ -72,27 +72,20 @@ prepareerStartwaarden.type2 <- function(extra, nweg, start, beschikbaar,
   while (!klaar) {
     
     #print(toewijzen)
-    if (aantalvast > 0) {
-      
+    if (aantalvast > 0) {  
       rest      <- bovengrens[-idxvast] - theta0[1:(K - aantalvast)]
-      idx       <- which(rest >= 1)
-      x         <- sample(idx, 1)
-      erbij     <- min(runif(n = 1, min = 0, max = min(perkeer, rest[x])), toewijzen)
-      theta0[x] <- theta0[x] + erbij
-      toewijzen <- toewijzen - erbij
-      klaar     <- (length(idx) == 0) | (toewijzen <= 0)
-      
     } else {
-      
-      rest      <- bovengrens
-      idx       <- which(rest >= 1)
-      x         <- sample(idx, 1)
+      rest      <- bovengrens - theta0[1:(K - aantalvast)]
+    }
+    
+    idx       <- which(rest >= 1)
+    if (length(idx) >= 1) {
+      x         <- idx[sample.int(length(idx), 1)]
       erbij     <- min(runif(n = 1, min = 0, max = min(perkeer, rest[x])), toewijzen)
       theta0[x] <- theta0[x] + erbij
       toewijzen <- toewijzen - erbij
-      klaar     <- (length(idx) == 0) | (toewijzen <= 0)
-      
     }
+    klaar     <- (length(idx) == 0) | (toewijzen <= 0)
     
   }
   
@@ -103,30 +96,22 @@ prepareerStartwaarden.type2 <- function(extra, nweg, start, beschikbaar,
   while (!klaar) {
     
     #print(toewijzen)
-    if (aantalvast > 0) {
-      
+    if (aantal0 > 0) {
       rest      <- start[-idx0] - theta0[-(1:(K - aantalvast))]
-      idx       <- which(rest >= 1)
-      x         <- sample(idx, 1)
+    } else {
+      rest      <- start - theta0[-(1:(K - aantalvast))]
+    }
+    
+    idx       <- which(rest >= 1)
+    if (length(idx) >= 1) {
+      x         <- idx[sample.int(length(idx), 1)]
       eraf      <- min(runif(n = 1, min = 0, max = min(perkeer, rest[x])), toewijzen)
       theta0[K - aantalvast + x] <- theta0[K - aantalvast + x] + eraf
       toewijzen <- toewijzen - eraf
-      klaar     <- (length(idx) == 0) | (toewijzen <= 0)
-
-    } else {
-      
-      rest      <- start
-      idx       <- which(rest >= 1)
-      x         <- sample(idx, 1)
-      eraf      <- min(runif(n = 1, min = 0, max = min(perkeer, rest[x])), toewijzen)
-      theta0[K - aantalvast + x]  <- theta0[K - aantalvast + x] + eraf
-      toewijzen <- toewijzen - eraf
-      klaar     <- (length(idx) == 0) | (toewijzen <= 0)
-      
     }
-  }
-  
+    klaar     <- (length(idx) == 0) | (toewijzen <= 0)
     
+  } 
   
   # cellen die nog op hun oorspronkelijke startwaarden liggen iets ophogen (met veel minder dan 1)
   idx00         <- which(theta0 == 0)
