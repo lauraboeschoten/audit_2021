@@ -21,8 +21,18 @@ berekenG2.type2 <- function(theta0, startaantallen, beschikbaar, rijtotalen, tab
   idxvast             <- which(beschikbaar == 0)
   idx0                <- which(startaantallen == 0)
   aantallen           <- startaantallen
-  aantallen[-idxvast] <- aantallen[-idxvast] + theta0[1:(K - length(idxvast))]
-  aantallen[-idx0]    <- aantallen[-idx0] - theta0[-(1:(K - length(idxvast)))]
+  
+  if (length(idxvast) > 0) {
+    aantallen[-idxvast] <- aantallen[-idxvast] + theta0[1:(K - length(idxvast))]
+  } else {
+    aantallen           <- aantallen + theta0[1:K]
+  }
+  if (length(idx0) > 0) {
+    aantallen[-idx0]    <- aantallen[-idx0] - theta0[-(1:(K - length(idxvast)))]
+  } else {
+    aantallen           <- aantallen - theta0[-(1:K)]
+  }
+  
   aantallen           <- c(rijtotalen - aantallen, aantallen)
   tab$Freq            <- pmax(0, round(aantallen, digits = 8))
   ktot                <- aggregate(tab$Freq, by = tab[ , c('Y','Z')], FUN = sum)
