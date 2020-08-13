@@ -24,8 +24,18 @@ berekenG2.grad.type2 <- function(theta0, startaantallen, beschikbaar, rijtotalen
   idxvast             <- which(beschikbaar == 0)
   idx0                <- which(startaantallen == 0)
   aantallen           <- startaantallen
-  aantallen[-idxvast] <- aantallen[-idxvast] + theta0[1:(K - length(idxvast))]
-  aantallen[-idx0]    <- aantallen[-idx0] - theta0[-(1:(K - length(idxvast)))]
+  
+  if (length(idxvast) > 0) {
+    aantallen[-idxvast] <- aantallen[-idxvast] + theta0[1:(K - length(idxvast))]
+  } else {
+    aantallen           <- aantallen + theta0[1:K]
+  }
+  if (length(idx0) > 0) {
+    aantallen[-idx0]    <- aantallen[-idx0] - theta0[-(1:(K - length(idxvast)))]
+  } else {
+    aantallen           <- aantallen - theta0[-(1:K)]
+  }
+  
   aantallen1          <- c(rijtotalen - aantallen, aantallen)
   tab$Freq            <- pmax(0, round(aantallen1, digits = 8))
   ktot                <- aggregate(tab$Freq, by = tab[ , c('Y','Z')], FUN = sum)
