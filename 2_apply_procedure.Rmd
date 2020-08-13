@@ -33,6 +33,11 @@ data <- generated_datasets[[1]]
 # Generate frequencytab from data
 tab  <- preparetables(data)
 
+# Compute constant term of deviance function
+tot  <- aggregate(tab$freq, by = tab[ , 'Y', drop = FALSE], FUN = sum)
+rtot <- aggregate(tab$freq, by = tab[ , c('X','Y')], FUN = sum)
+cst  <- 2 * sum(tot$x * log(tot$x), na.rm=TRUE) - 2 * sum(rtot$x * log(rtot$x), na.rm=TRUE)
+
 
 # Prepare restrictions for minimalization procedure
 #extra, nweg, start, beschikbaar, typ
@@ -73,7 +78,7 @@ for (s in 1:nrow(ex_nweg)) {
                                           nweg        = ex_nweg[s,2],
                                           start       = start,
                                           beschikbaar = beschikbaar,
-                                          Lextra      = 0.90, 
+                                          Lextra      = 0.10, 
                                           Uextra      = 0.99,
                                           Lweg        = 0.10, 
                                           Uweg        = 0.99)
@@ -83,13 +88,12 @@ for (s in 1:nrow(ex_nweg)) {
                               grad           = berekenG2.grad.type2,
                               ui             = prepAb$A,
                               ci             = prepAb$b, 
-                              control        = list(maxit = 10000),
+                              control        = list(maxit = 1000, abstol = 1e-3),
                               startaantallen = start,
                               beschikbaar    = beschikbaar,
                               rijtotalen     = rijtotalen,
                               tab            = tab,
-                              cst            =   2 * sum(tab$tot   * log(tab$tot), na.rm=TRUE) -
-                                                 2 * sum(tab$rtot * log(tab$rtot), na.rm=TRUE))
+                              cst            = cst)
     
     if (oplossingP$convergence == 0 & oplossingP$value < beste) {
       oplossing <- oplossingP
