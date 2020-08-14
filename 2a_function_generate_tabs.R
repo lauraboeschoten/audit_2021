@@ -3,7 +3,7 @@
 preparetables <- function(data) {
   
   # prepare tab xyz
-  tab_xyz = aggregate(data$freq, by = list(X = data$X, Y = data$Y, Z = data$Z), 
+  tab_xyz = aggregate(data[,5], by = list(X = data$X, Y = data$Y, Z = data$Z), 
                       FUN  = sum, drop = TRUE)
   colnames(tab_xyz) = c("X","Y","Z","freq")
   
@@ -12,17 +12,17 @@ preparetables <- function(data) {
   tab_available = tab_xyz[which(tab_xyz$Z=='2'),]
   
   # prepare tab xy (RTOT)
-  tab_xy = aggregate(data$freq, by = list(X = data$X, Y = data$Y), 
+  tab_xy = aggregate(data[,5], by = list(X = data$X, Y = data$Y), 
                       FUN  = sum, drop = TRUE)
   colnames(tab_xy) = c("X","Y","rtot")
   
   # prepare tab yz (KTOT)
-  tab_yz = aggregate(data$freq, by = list(Y = data$Y, Z = data$Z), 
+  tab_yz = aggregate(data[,5], by = list(Y = data$Y, Z = data$Z), 
                       FUN  = sum, drop = TRUE)
   colnames(tab_yz) = c("Y","Z","ktot")
   
   # prepare tab y (TOT)
-  tab_y = aggregate(data$freq, by = list(Y = data$Y), 
+  tab_y = aggregate(data[,5], by = list(Y = data$Y), 
                      FUN  = sum, drop = TRUE)
   colnames(tab_y) = c("Y","tot")
   

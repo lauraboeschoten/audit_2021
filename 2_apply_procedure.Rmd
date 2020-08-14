@@ -25,122 +25,131 @@ source("2d_function_calculate_deviance.R")
 source("2e_function_calculate_gradient.R")
 ```
 
-```{r bigloop}
+```{r bigloop, tidy = TRUE, tidy.opts = list(comment = FALSE)}
 
-# select dataset from list
-data <- generated_datasets[[1]]
+n_conditions  = 2 #36
+n_iterations  = 2 #1000
+n_results     = 5
 
-# Generate frequencytab from data
-tab  <- preparetables(data)
+results <- vector(mode = "list", length = n_conditions)
 
-# Compute constant term of deviance function
-tot  <- aggregate(tab$freq, by = tab[ , 'Y', drop = FALSE], FUN = sum)
-rtot <- aggregate(tab$freq, by = tab[ , c('X','Y')], FUN = sum)
-cst  <- 2 * sum(tot$x * log(tot$x), na.rm=TRUE) - 2 * sum(rtot$x * log(rtot$x), na.rm=TRUE)
+for(i in 1:n_conditions){
+  results[[i]] <- vector(mode = "list", length = n_iterations)
+}
 
+# loop over conditions
+for(i in 1:n_conditions){
 
-# Prepare restrictions for minimalization procedure
-#extra, nweg, start, beschikbaar, typ
-
-extra     <- c(1000L)
-nweg      <- c(1L, 2L)
-ex_nweg   <- expand.grid(extra=extra,nweg=nweg)
-maxpoging <- 200L
-
-conv             <- rep(NA_integer_, nrow(ex_nweg))
-G2sol            <- rep(NA_real_, nrow(ex_nweg))
-extra_toegewezen <- rep(NA_real_, nrow(ex_nweg))
-extra_weggelaten <- rep(NA_real_, nrow(ex_nweg))
-tab_extra_v2     <- tab
-
-start       <- tab$freq[tab$Z  == '1']
-beschikbaar <- tab$freqZ[tab$Z == '1']
-rijtotalen  <- tab$rtot[tab$Z  == '1']
-
-set.seed(20200810 * 2)
-for (s in 1:nrow(ex_nweg)) {
-  cat(sprintf('Bepaal optimale toewijzing van %d extra eenheden en %d weglaten\n', 
-              ex_nweg[s,1], ex_nweg[s,1]*ex_nweg[s,2]))
-  flush.console()
-  
-  prepAb <- prepareerRestricties(extra       = ex_nweg[s,1],
-                                 nweg        = ex_nweg[s,2],
-                                 start       = start,
-                                 beschikbaar = beschikbaar,
-                                 type        = 2)
-  
-  beste <- Inf
-  for (poging in 1:maxpoging) {
-    cat(sprintf('---Poging %d van %d\n', poging, maxpoging))
-    flush.console()
+  # loop over iterations
+  for(j in 1:n_iterations){
+    cat(sprintf('Condition %d iteration %d', i, j))
+    # select dataset j from condition i
+    data <- generated_datasets[[i]][,c(1:4,j+4)]
     
-    theta0 <- prepareerStartwaarden.type2(extra       = ex_nweg[s,1],
-                                          nweg        = ex_nweg[s,2],
-                                          start       = start,
-                                          beschikbaar = beschikbaar,
-                                          Lextra      = 0.10, 
-                                          Uextra      = 0.99,
-                                          Lweg        = 0.10, 
-                                          Uweg        = 0.99)
+    # Generate frequencytab from data
+    tab  <- preparetables(data)
 
-    oplossingP <- constrOptim(theta          = theta0, 
-                              f              = berekenG2.type2,
-                              grad           = berekenG2.grad.type2,
-                              ui             = prepAb$A,
-                              ci             = prepAb$b, 
-                              control        = list(maxit = 1000, abstol = 1e-3),
-                              startaantallen = start,
-                              beschikbaar    = beschikbaar,
-                              rijtotalen     = rijtotalen,
-                              tab            = tab,
-                              cst            = cst)
+    # Compute constant term of deviance function
+    tot  <- aggregate(tab$freq, by = tab[ , 'Y', drop = FALSE], FUN = sum)
+    rtot <- aggregate(tab$freq, by = tab[ , c('X','Y')], FUN = sum)
+    cst  <- 2 * sum(tot$x * log(tot$x), na.rm=TRUE) - 2 * sum(rtot$x * log(rtot$x), na.rm=TRUE)
     
-    if (oplossingP$convergence == 0 & oplossingP$value < beste) {
-      oplossing <- oplossingP
-      beste <- oplossing$value
-      cat(sprintf('-----Betere oplossing gevonden met G^2 = %10.8f\n', beste))
+    
+    # Prepare restrictions for minimalization procedure
+    #extra, nweg, start, beschikbaar, typ
+
+    extra     <- c(1000L)
+    nweg      <- c(1L)
+    ex_nweg   <- expand.grid(extra=extra,nweg=nweg)
+    maxpoging <- 100L
+    
+    conv             <- rep(NA_integer_, nrow(ex_nweg))
+    G2sol            <- rep(NA_real_, nrow(ex_nweg))
+    extra_toegewezen <- rep(NA_real_, nrow(ex_nweg))
+    extra_weggelaten <- rep(NA_real_, nrow(ex_nweg))
+    tab_extra        <- tab
+    
+    start       <- tab$freq[tab$Z  == '1']
+    beschikbaar <- tab$freqZ[tab$Z == '1']
+    rijtotalen  <- tab$rtot[tab$Z  == '1']
+
+    set.seed(20200810 * 2)
+    for (s in 1:nrow(ex_nweg)) {
+      cat(sprintf('Bepaal optimale toewijzing van %d extra eenheden en %d weglaten\n', 
+                  ex_nweg[s,1], ex_nweg[s,1]*ex_nweg[s,2]))
       flush.console()
-    } else if (poging == 1) {
-      oplossing <- oplossingP
+      
+      prepAb <- prepareerRestricties(extra       = ex_nweg[s,1],
+                                     nweg        = ex_nweg[s,2],
+                                     start       = start,
+                                     beschikbaar = beschikbaar,
+                                     type        = 2)
+      
+      beste <- Inf
+      
+      for (poging in 1:maxpoging) {
+        cat(sprintf('---Poging %d van %d\n', poging, maxpoging))
+        flush.console()
+        
+        theta0 <- prepareerStartwaarden.type2(extra       = ex_nweg[s,1],
+                                              nweg        = ex_nweg[s,2],
+                                              start       = start,
+                                              beschikbaar = beschikbaar,
+                                              Lextra      = 0.10, 
+                                              Uextra      = 0.99,
+                                              Lweg        = 0.10, 
+                                              Uweg        = 0.99)
+        
+        oplossingP <- constrOptim(theta          = theta0, 
+                                  f              = berekenG2.type2,
+                                  grad           = berekenG2.grad.type2,
+                                  ui             = prepAb$A,
+                                  ci             = prepAb$b, 
+                                  control        = list(maxit = 1000, abstol = 1e-3),
+                                  startaantallen = start,
+                                  beschikbaar    = beschikbaar,
+                                  rijtotalen     = rijtotalen,
+                                  tab            = tab,
+                                  cst            = cst)
+        
+        if (oplossingP$convergence == 0 & oplossingP$value < beste) {
+          oplossing <- oplossingP
+          beste <- oplossing$value
+          cat(sprintf('-----Betere oplossing gevonden met G^2 = %10.8f\n', beste))
+          flush.console()
+          
+        } else if (poging == 1) {
+          
+          oplossing <- oplossingP
+        }
+      }
     }
+    
+    ## Resultaat
+    conv[s]  <- oplossing$convergence        # oplossing gevonden? (0 = ja)
+    G2sol[s] <- oplossing$value              # waarde doelfunctie in minimum
+    
+    # Vertaal oplossing naar frequentietabel
+    Freqsol                         <- start
+    Freqsol[which(beschikbaar > 0)] <- Freqsol[which(beschikbaar > 0)] + oplossing$par[1:(sum(beschikbaar > 0))]
+    Freqsol[which(start > 0)]       <- Freqsol[which(start > 0)] - oplossing$par[-(1:(sum(beschikbaar > 0)))]
+    Freqsol                         <- c(rijtotalen - Freqsol, Freqsol)
+    extra_toegewezen[s]             <- sum(oplossing$par[1:(sum(beschikbaar > 0))])
+    extra_weggelaten[s]             <- sum(oplossing$par[-(1:(sum(beschikbaar > 0)))])
+    
+    tab_extra[ , paste0('Freq.plus.', ex_nweg[s,1], ex_nweg[s,2])] <- round(Freqsol, digits = 1)
+    
+    # store results
+    
+    reslist = list(conv, extra_toegewezen, extra_weggelaten, G2sol, tab_extra)
+    results[[i]][[j]] = reslist
+    
+    saveRDS(results, "results.RDS")
+    
+    
+    
   }
-  
-  ## Resultaat
-  conv[s] <- oplossing$convergence        # oplossing gevonden? (0 = ja)
-  G2sol[s] <- oplossing$value     # waarde doelfunctie in minimum
-  
-  # Vertaal oplossing naar frequentietabel
-  Freqsol <- start
-  Freqsol[which(beschikbaar > 0)] <- Freqsol[which(beschikbaar > 0)] + oplossing$par[1:(sum(beschikbaar > 0))]
-  Freqsol[which(start > 0)] <- Freqsol[which(start > 0)] - oplossing$par[-(1:(sum(beschikbaar > 0)))]
-  Freqsol <- c(rijtotalen - Freqsol, Freqsol)
-  extra_toegewezen[s] <- sum(oplossing$par[1:(sum(beschikbaar > 0))])
-  extra_weggelaten[s] <- sum(oplossing$par[-(1:(sum(beschikbaar > 0)))])
-  
-  tab_extra_v2[ , paste0('Freq.plus.', ex_nweg[s,1], ex_nweg[s,2])] <- round(Freqsol, digits = 1)
   
 }
 
-
-
-
-conv_v2 <- conv
-extra_toegewezen_v2 <- extra_toegewezen
-extra_weggelaten_v2 <- extra_weggelaten
-G2_v2 <- c(G2handmatig, G2sol)
-conv_v2
-extra_toegewezen_v2
-extra_weggelaten_v2
-G2_v2
-
-res_v2 <- data.frame(extra = c(0, ex_nweg[,1]),
-                     nweg  = c(0, ex_nweg[,1]*ex_nweg[,2]),
-                     toegewezen = c(0, extra_toegewezen_v2),
-                     weggelaten = c(0, extra_weggelaten_v2),
-                     G2 = G2_v2)
-saveRDS(res_v2, file = "oplossing_minG2_v2_samenvatting_1200_2.rds")
-
-saveRDS(tab_extra_v2, file = "oplossing_minG2_v2_1200_2.rds")
-
-#
 ```
