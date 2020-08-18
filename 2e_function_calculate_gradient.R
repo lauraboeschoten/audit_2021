@@ -44,16 +44,6 @@ berekenG2.grad.type2 <- function(theta0, startaantallen, beschikbaar, rijtotalen
   grad                <- 2 * (log(aantallen) - log(rijtotalen - aantallen)) -
                          2 * (log(temp1) - log(temp2))
   
-  #if (idxvast > 0) {
-    
-  #  return(c(grad[-idxvast],-grad[-idx0]))
-    
-  #} else {
-    
-    return(c(grad,-grad))
-    
-  #}
-  
-  
-  #return(c(grad[-idxvast],-grad[-idx0]))
+  return(c(grad[beschikbaar != 0], -grad[startaantallen != 0]))
+
 }
