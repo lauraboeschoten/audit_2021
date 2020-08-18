@@ -33,7 +33,7 @@ berekenG2.grad.type2 <- function(theta0, startaantallen, beschikbaar, rijtotalen
   if (length(idx0) > 0) {
     aantallen[-idx0]    <- aantallen[-idx0] - theta0[-(1:(K - length(idxvast)))]
   } else {
-    aantallen           <- aantallen - theta0[-(1:K)]
+    aantallen           <- aantallen - theta0[-(1:(K - length(idxvast)))]
   }
   
   aantallen1          <- c(rijtotalen - aantallen, aantallen)
