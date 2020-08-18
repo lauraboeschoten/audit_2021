@@ -1,0 +1,79 @@
+---
+title: "3 Evaluate output"
+output: html_document
+---
+
+```{r setup, eval=FALSE, echo=TRUE}
+library(tidyverse)
+library(plyr)
+
+setwd("C:/Users/F112974/surfdrive/Onderzoek/CBS/audit_paper/simulatie")
+
+load("datasets.RData")
+load("distributions.RData")
+results <- readRDS("results.rds")
+```
+
+function for crossentropy
+```{r crossentropy, eval=FALSE, echo=TRUE}
+CrossEntropy <- function(yHat, y) {
+  if (y==1){
+    result = -log(yHat)
+  } else {
+    result = -log(1-yHat)
+  }
+  return(result)
+}
+```
+
+```{r conditions, eval=FALSE, echo=TRUE}
+
+n_conditions  = 2 #36
+n_iterations  = 10 #1000
+n_results     = 5
+```
+
+```{r getout, eval=FALSE, echo=TRUE}
+
+simres <- vector(mode = "list", length = n_conditions)
+
+for(i in 1:n_conditions){
+  simres[[i]] <- vector(mode = "list", length = n_iterations)
+}
+
+# loop over conditions
+for(i in 1:n_conditions){
+  
+  # get population values for evaluation
+  popprob      <- generated_distributions[[i]]
+  popprob      <- ddply(popprob, .(W), summarize, prob=sum(prob))
+  popprob$prob <- popprob$prob/sum(popprob$prob)
+
+  # loop over iterations
+  for(j in 1:n_iterations){
+    cat(sprintf('Condition %d iteration %d', i, j))
+    
+    # select dataset j from condition i
+    #data <- generated_datasets[[i]][,c(1:4,j+4)]
+    
+    resultsdata          <- results[[i]][[j]][[5]][c(10:18),c("X","freqplus")] #10:18 hier moet aangepast worden naar which z=2
+    resultsdata$prob     <- resultsdata$freqplus/sum(resultsdata$freqplus)
+    resultsdata          <- resultsdata[order(resultsdata$Y),]
+    resultsdata$se       <- sqrt((resultsdata$prob*(1-resultsdata$prob))/sum(resultsdata$freqplus))
+    resultsdata$bias     <- (abs(resultsdata$prob - popprob$prob))
+    resultsdata$coverage <- (resultsdata$prob-1.96*resultsdata$se) < popprob$prob & 
+                            (resultsdata$prob+1.96*resultsdata$se) > popprob$pro 
+    
+    resultsdata$crossentropy <- NA
+    
+    for (k in 1: length(popprob$prob)){
+      resultsdata[k,"crossentropy"] <- CrossEntropy(resultsdata[i,"prob"], popprob[i,"prob"])
+    }
+    
+    # hier nog terugschrijven naar list 
+    simres[[i]][[j]] = resultsdata
+  }
+}
+    
+    
+```

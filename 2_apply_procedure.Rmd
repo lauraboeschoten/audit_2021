@@ -3,7 +3,7 @@ title: "2 apply methodology"
 output: html_document
 ---
 
-```{r setup, warning=FALSE}
+```{r setup, eval=FALSE, echo=TRUE}
 library(tidyverse)
 library(dplyr)
 
@@ -11,13 +11,13 @@ setwd("C:/Users/F112974/surfdrive/Onderzoek/CBS/audit_paper/simulatie")
 ```
 
 Load the list with generated datasets
-```{r readdata}
+```{r readdata, eval=FALSE, echo=TRUE}
 load("datasets.RData")
 ```
 
 
 Load written functions
-```{r functions}
+```{r functions, eval=FALSE, echo=TRUE}
 source("2a_function_generate_tabs.R")
 source("2b_function_restrictions_minimalisation.R")
 source("2c_function_prepare_startingvalues.R")
@@ -25,10 +25,10 @@ source("2d_function_calculate_deviance.R")
 source("2e_function_calculate_gradient.R")
 ```
 
-```{r bigloop, tidy = TRUE, tidy.opts = list(comment = FALSE)}
+```{r bigloop, eval=FALSE, echo=TRUE}
 
 n_conditions  = 2 #36
-n_iterations  = 2 #1000
+n_iterations  = 10 #1000
 n_results     = 5
 
 results <- vector(mode = "list", length = n_conditions)
@@ -59,7 +59,7 @@ for(i in 1:n_conditions){
     #extra, nweg, start, beschikbaar, typ
 
     extra     <- c(1000L)
-    nweg      <- c(1L)
+    nweg      <- c(0.1L)
     ex_nweg   <- expand.grid(extra=extra,nweg=nweg)
     maxpoging <- 100L
     
@@ -137,7 +137,7 @@ for(i in 1:n_conditions){
     extra_toegewezen[s]             <- sum(oplossing$par[1:(sum(beschikbaar > 0))])
     extra_weggelaten[s]             <- sum(oplossing$par[-(1:(sum(beschikbaar > 0)))])
     
-    tab_extra[ , paste0('Freq.plus.', ex_nweg[s,1], ex_nweg[s,2])] <- round(Freqsol, digits = 1)
+    tab_extra[,"freqplus"] <- round(Freqsol, digits = 1)
     
     # store results
     
@@ -145,8 +145,6 @@ for(i in 1:n_conditions){
     results[[i]][[j]] = reslist
     
     saveRDS(results, "results.RDS")
-    
-    
     
   }
   
