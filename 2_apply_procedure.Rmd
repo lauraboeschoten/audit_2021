@@ -1,6 +1,8 @@
 ---
 title: "2 apply methodology"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, eval=FALSE, echo=TRUE}
@@ -27,8 +29,8 @@ source("2e_function_calculate_gradient.R")
 
 ```{r bigloop, eval=FALSE, echo=TRUE}
 
-n_conditions  = 2 #36
-n_iterations  = 10 #1000
+n_conditions  = 4 #4
+n_iterations  = 2 #1000
 n_results     = 5
 
 results <- vector(mode = "list", length = n_conditions)
@@ -58,10 +60,10 @@ for(i in 1:n_conditions){
     # Prepare restrictions for minimalization procedure
     #extra, nweg, start, beschikbaar, typ
 
-    extra     <- c(1000L)
+    extra     <- c(100L)
     nweg      <- c(0.1L)
     ex_nweg   <- expand.grid(extra=extra,nweg=nweg)
-    maxpoging <- 100L
+    maxpoging <- 200L
     
     conv             <- rep(NA_integer_, nrow(ex_nweg))
     G2sol            <- rep(NA_real_, nrow(ex_nweg))
