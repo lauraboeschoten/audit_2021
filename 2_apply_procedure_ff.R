@@ -1,37 +1,22 @@
----
-title: "2 apply methodology"
-output: html_document
-editor_options: 
-  chunk_output_type: console
----
-
-```{r setup, eval=FALSE, echo=TRUE}
 library(tidyverse)
 library(dplyr)
 
 setwd("C:/Users/F112974/surfdrive/Onderzoek/CBS/audit_paper/simulatie")
-```
 
-Load the list with generated datasets
-```{r readdata, eval=FALSE, echo=TRUE}
-load("datasets.RData")
-```
+load("datasets_ff.RData")
+load("distributions_ff.RData")
 
-
-Load written functions
-```{r functions, eval=FALSE, echo=TRUE}
 source("2a_function_generate_tabs.R")
 source("2b_function_restrictions_minimalisation.R")
 source("2c_function_prepare_startingvalues.R")
 source("2d_function_calculate_deviance.R")
 source("2e_function_calculate_gradient.R")
-```
+source("2f_function_loglinear_model.R")
+source("2g_function_proportionW.R")
 
-```{r bigloop, eval=FALSE, echo=TRUE}
-
-n_conditions  = 4 #4
+n_conditions  = 6 #4
 n_iterations  = 2 #1000
-n_results     = 5
+n_results     = 8
 
 results <- vector(mode = "list", length = n_conditions)
 
@@ -41,7 +26,7 @@ for(i in 1:n_conditions){
 
 # loop over conditions
 for(i in 1:n_conditions){
-
+  
   # loop over iterations
   for(j in 1:n_iterations){
     cat(sprintf('Condition %d iteration %d', i, j))
@@ -50,18 +35,22 @@ for(i in 1:n_conditions){
     
     # Generate frequencytab from data
     tab  <- preparetables(data)
-
+    
     # Compute constant term of deviance function
     tot  <- aggregate(tab$freq, by = tab[ , 'Y', drop = FALSE], FUN = sum)
     rtot <- aggregate(tab$freq, by = tab[ , c('X','Y')], FUN = sum)
     cst  <- 2 * sum(tot$x * log(tot$x), na.rm=TRUE) - 2 * sum(rtot$x * log(rtot$x), na.rm=TRUE)
     
+    # deviance independence model
     
+    model_before <- fitmodel(model = 'freq ~ X*Y + Y*Z',
+                       tab = tab)
+
     # Prepare restrictions for minimalization procedure
     #extra, nweg, start, beschikbaar, typ
-
-    extra     <- c(100L)
-    nweg      <- c(0.1L)
+    
+    extra     <- c(300L)
+    nweg      <- c(0.05L)
     ex_nweg   <- expand.grid(extra=extra,nweg=nweg)
     maxpoging <- 200L
     
@@ -74,7 +63,7 @@ for(i in 1:n_conditions){
     start       <- tab$freq[tab$Z  == '1']
     beschikbaar <- tab$freqZ[tab$Z == '1']
     rijtotalen  <- tab$rtot[tab$Z  == '1']
-
+    
     set.seed(20200810 * 2)
     for (s in 1:nrow(ex_nweg)) {
       cat(sprintf('Bepaal optimale toewijzing van %d extra eenheden en %d weglaten\n', 
@@ -139,17 +128,27 @@ for(i in 1:n_conditions){
     extra_toegewezen[s]             <- sum(oplossing$par[1:(sum(beschikbaar > 0))])
     extra_weggelaten[s]             <- sum(oplossing$par[-(1:(sum(beschikbaar > 0)))])
     
-    tab_extra[,"freqplus"] <- round(Freqsol, digits = 1)
+    tab_extra[,"freqplus"] <- round(Freqsol, digits = 0)
+    
+    propW <- results_W(data, tab_extra)
+    
+
+
     
     # store results
+    reslist = list(conv, 
+                   extra_toegewezen, 
+                   extra_weggelaten, 
+                   model_before$G2, 
+                   G2sol, 
+                   ((model_before$G2-G2sol)/model_before$G2), 
+                   propW,
+                   tab_extra)
     
-    reslist = list(conv, extra_toegewezen, extra_weggelaten, G2sol, tab_extra)
     results[[i]][[j]] = reslist
     
-    saveRDS(results, "results.RDS")
+    saveRDS(results, "results_ff.RDS")
     
   }
   
 }
-
-```
