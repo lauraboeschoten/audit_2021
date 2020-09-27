@@ -13,10 +13,11 @@ source("2d_function_calculate_deviance.R")
 source("2e_function_calculate_gradient.R")
 source("2f_function_loglinear_model.R")
 source("2g_function_proportionW.R")
+source("2h_function_proportionWX.R")
 
 n_conditions  = 6 #4
 n_iterations  = 2 #1000
-n_results     = 8
+n_results     = 9
 
 results <- vector(mode = "list", length = n_conditions)
 
@@ -131,6 +132,7 @@ for(i in 1:n_conditions){
     tab_extra[,"freqplus"] <- round(Freqsol, digits = 0)
     
     propW <- results_W(data, tab_extra)
+    propWX <- results_WX(data, tab_extra, propW)
     
 
 
@@ -143,6 +145,7 @@ for(i in 1:n_conditions){
                    G2sol, 
                    ((model_before$G2-G2sol)/model_before$G2), 
                    propW,
+                   propWX,
                    tab_extra)
     
     results[[i]][[j]] = reslist
