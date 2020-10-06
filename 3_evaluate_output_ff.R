@@ -14,19 +14,39 @@ n_results     = 9
 
 
 res_dev    <- vector(mode = "list", length = n_conditions)
+
 res_biasW  <- vector(mode = "list", length = n_conditions)
-res_covW   <- vector(mode = "list", length = n_conditions)
 res_biasXW <- vector(mode = "list", length = n_conditions)
+
+res_llW    <- vector(mode = "list", length = n_conditions)
+res_llXW   <- vector(mode = "list", length = n_conditions)
+
+res_ulW    <- vector(mode = "list", length = n_conditions)
+res_ulXW   <- vector(mode = "list", length = n_conditions)
+
+res_covW   <- vector(mode = "list", length = n_conditions)
 res_covXW  <- vector(mode = "list", length = n_conditions)
 
 for(i in 1:n_conditions){
   res_dev[[i]]    <- matrix(NA, ncol = n_iterations, nrow = 1)
+  
   res_biasW[[i]]  <- matrix(NA, ncol = n_iterations, nrow = 3)
+  
+  res_llW[[i]]    <- matrix(NA, ncol = n_iterations, nrow = 3)
+  res_ulW[[i]]    <- matrix(NA, ncol = n_iterations, nrow = 3)
+  res_covW[[i]]   <- matrix(NA, ncol = n_iterations, nrow = 3)
+  
   res_biasXW[[i]] <- matrix(NA, ncol = n_iterations, nrow = 9)
+  
+  res_llXW[[i]]   <- matrix(NA, ncol = n_iterations, nrow = 9)
+  res_ulXW[[i]]   <- matrix(NA, ncol = n_iterations, nrow = 9)
+  res_covXW[[i]]  <- matrix(NA, ncol = n_iterations, nrow = 9)
   
   popW  <- aggregate(prob ~ W, data = generated_distributions[[i]], sum)
   popXW <- aggregate(prob ~ X + W, data = generated_distributions[[i]], sum) # hier conditionals van maken
-  popXW[1:3,"prob"]/sum(popXW[1:3,"prob"])
+  popXW[1:3,"prob"] <- popXW[1:3,"prob"]/sum(popXW[1:3,"prob"])
+  popXW[4:6,"prob"] <- popXW[4:6,"prob"]/sum(popXW[4:6,"prob"])
+  popXW[7:9,"prob"] <- popXW[7:9,"prob"]/sum(popXW[7:9,"prob"])
   
 
   
@@ -36,8 +56,19 @@ for(i in 1:n_conditions){
     res_biasW[[i]][,j]  <- abs(popW[,"prob"] - results[[i]][[j]][[7]][,"prop"])/popW[,"prob"]
     res_biasXW[[i]][,j] <- abs(popXW[,"prob"] - results[[i]][[j]][[8]][,"prop"])/popXW[,"prob"]
     
+    # coverage: sample size nog uitrekenen! 
+    res_llW[[i]][,j]    <-  results[[i]][[j]][[7]][,"prop"] - qt(.975, 200-1) * sqrt(results[[i]][[j]][[7]][,"var"])
+    res_ulW[[i]][,j]    <-  results[[i]][[j]][[7]][,"prop"] + qt(.975, 200-1) * sqrt(results[[i]][[j]][[7]][,"var"])
+    res_covW[[i]][,j]   <-  res_llW[[i]][,j] < popW[,"prob"] & popW[,"prob"] < res_ulW[[i]][,j]
+    
+    res_llXW[[i]][,j]    <-  results[[i]][[j]][[8]][,"prop"] - qt(.975, 200-1) * sqrt(results[[i]][[j]][[8]][,"var"])
+    res_ulXW[[i]][,j]    <-  results[[i]][[j]][[8]][,"prop"] + qt(.975, 200-1) * sqrt(results[[i]][[j]][[8]][,"var"])
+    res_covXW[[i]][,j]   <-  res_llXW[[i]][,j] < popXW[,"prob"] & popXW[,"prob"] < res_ulXW[[i]][,j]
+    
   }
 }
+
+save.image("simresults.RData")
 
 
 # generate output 
