@@ -57,12 +57,14 @@ for(i in 1:n_conditions){
     res_biasXW[[i]][,j] <- abs(popXW[,"prob"] - results[[i]][[j]][[8]][,"prop"])/popXW[,"prob"]
     
     # coverage: sample size nog uitrekenen! 
-    res_llW[[i]][,j]    <-  results[[i]][[j]][[7]][,"prop"] - qt(.975, 200-1) * sqrt(results[[i]][[j]][[7]][,"var"])
-    res_ulW[[i]][,j]    <-  results[[i]][[j]][[7]][,"prop"] + qt(.975, 200-1) * sqrt(results[[i]][[j]][[7]][,"var"])
+    ssize <- sum(results[[i]][[j]][[9]][results[[i]][[j]][[9]]$Z==1,"freqplus"])
+    
+    res_llW[[i]][,j]    <-  results[[i]][[j]][[7]][,"prop"] - qt(.975, ssize-1) * sqrt(results[[i]][[j]][[7]][,"var"])
+    res_ulW[[i]][,j]    <-  results[[i]][[j]][[7]][,"prop"] + qt(.975, ssize-1) * sqrt(results[[i]][[j]][[7]][,"var"])
     res_covW[[i]][,j]   <-  res_llW[[i]][,j] < popW[,"prob"] & popW[,"prob"] < res_ulW[[i]][,j]
     
-    res_llXW[[i]][,j]    <-  results[[i]][[j]][[8]][,"prop"] - qt(.975, 200-1) * sqrt(results[[i]][[j]][[8]][,"var"])
-    res_ulXW[[i]][,j]    <-  results[[i]][[j]][[8]][,"prop"] + qt(.975, 200-1) * sqrt(results[[i]][[j]][[8]][,"var"])
+    res_llXW[[i]][,j]    <-  results[[i]][[j]][[8]][,"prop"] - qt(.975, ssize-1) * sqrt(results[[i]][[j]][[8]][,"var"])
+    res_ulXW[[i]][,j]    <-  results[[i]][[j]][[8]][,"prop"] + qt(.975, ssize-1) * sqrt(results[[i]][[j]][[8]][,"var"])
     res_covXW[[i]][,j]   <-  res_llXW[[i]][,j] < popXW[,"prob"] & popXW[,"prob"] < res_ulXW[[i]][,j]
     
   }

@@ -125,7 +125,7 @@ for(i in 1:n_conditions){
     Freqsol                         <- start
     Freqsol[which(beschikbaar > 0)] <- Freqsol[which(beschikbaar > 0)] + oplossing$par[1:(sum(beschikbaar > 0))]
     Freqsol[which(start > 0)]       <- Freqsol[which(start > 0)] - oplossing$par[-(1:(sum(beschikbaar > 0)))]
-    Freqsol                         <- c(rijtotalen - Freqsol, Freqsol)
+    Freqsol                         <- c(Freqsol, rijtotalen - Freqsol)
     extra_toegewezen[s]             <- sum(oplossing$par[1:(sum(beschikbaar > 0))])
     extra_weggelaten[s]             <- sum(oplossing$par[-(1:(sum(beschikbaar > 0)))])
     
