@@ -12,11 +12,11 @@ source("2c_function_prepare_startingvalues.R")
 source("2d_function_calculate_deviance.R")
 source("2e_function_calculate_gradient.R")
 source("2f_function_loglinear_model.R")
-source("2g_function_proportionW.R")
-source("2h_function_proportionWX.R")
+source("2g_function_generate_W_for_audit.R")
+source("2h_function_proportionW_and_WX.R")
 
-n_conditions  = 6 #4
-n_iterations  = 2 #1000
+n_conditions  = 8 #8
+n_iterations  = 1000 #1000
 n_results     = 9
 
 results <- vector(mode = "list", length = n_conditions)
@@ -65,7 +65,9 @@ for(i in 1:n_conditions){
     beschikbaar <- tab$freqZ[tab$Z == '1']
     rijtotalen  <- tab$rtot[tab$Z  == '1']
     
-    set.seed(20200810 * 2)
+    seed = sum(i,j)
+    set.seed(seed)
+    #set.seed(20200810 * 2)
     for (s in 1:nrow(ex_nweg)) {
       cat(sprintf('Bepaal optimale toewijzing van %d extra eenheden en %d weglaten\n', 
                   ex_nweg[s,1], ex_nweg[s,1]*ex_nweg[s,2]))
@@ -131,8 +133,15 @@ for(i in 1:n_conditions){
     
     tab_extra[,"freqplus"] <- round(Freqsol, digits = 0)
     
-    propW <- results_W(data, tab_extra)
-    propWX <- results_WX(data, tab_extra, propW)
+    tab_audit <- generate_W_for_audit(data, tab_extra)
+    
+    prop_list <- results_W_and_WX(tab_audit, tab_extra)
+    propW <- prop_list[[1]]
+    propWX <- prop_list[[2]]
+    
+    
+    #propW <- results_W(data, tab_extra)
+    #propWX <- results_WX(data, tab_extra, propW)
     
 
 
