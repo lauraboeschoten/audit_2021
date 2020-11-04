@@ -3,12 +3,12 @@ library(plyr)
 
 setwd("C:/Users/F112974/surfdrive/Onderzoek/CBS/audit_paper/simulatie")
 
-load("datasets_ff.RData")
-load("distributions_ff.RData")
+load("datasets_WY.RData")
+load("distributions_WY.RData")
 
-results <- readRDS("results_ff.rds")
+results <- readRDS("results_WY.rds")
 
-n_conditions  = 8 #4
+n_conditions  = 4 #4
 n_iterations  = 1000 #1000
 n_results     = 9
 
@@ -54,8 +54,9 @@ for(i in 1:n_conditions){
   for(j in 1:n_iterations){
     
     res_dev[[i]][,j]    <- results[[i]][[j]][[6]]
-    res_biasW[[i]][,j]  <- abs(popW[,"prob"] - results[[i]][[j]][[7]][,"prop"])  #/popW[,"prob"]
-    res_biasXW[[i]][,j] <- abs(popXW[,"prob"] - results[[i]][[j]][[8]][,"prop"]) #/popXW[,"prob"]
+    # absolute bias delen door 1 om 
+    res_biasW[[i]][,j]  <- abs(popW[,"prob"] - results[[i]][[j]][[7]][,"prop"])  #/  popW[,"prob"]
+    res_biasXW[[i]][,j] <- abs(popXW[,"prob"] - results[[i]][[j]][[8]][,"prop"]) #/  popXW[,"prob"]
     
     # coverage: sample size nog uitrekenen! 
     ssize <- sum(results[[i]][[j]][[9]][results[[i]][[j]][[9]]$Z==1,"freqplus"])
@@ -69,6 +70,11 @@ for(i in 1:n_conditions){
     res_covXW[[i]][,j]   <-  res_llXW[[i]][,j] < popXW[,"prob"] & popXW[,"prob"] < res_ulXW[[i]][,j]
     
   }
+  
+  # replace NaN caused by 0/0 for 0 
+  #res_biasW[[i]][is.nan(res_biasW[[i]])] <- 0
+  #res_biasXW[[i]][is.nan(res_biasXW[[i]])] <- 0
+  
 }
 
 deviance = matrix(NA, nrow = n_conditions)
@@ -98,7 +104,5 @@ for(i in 1:n_conditions){
   }
 
 
-save.image("simresults_ff.RData")
+save.image("simresults_WY.RData")
 
-
-# generate output 
