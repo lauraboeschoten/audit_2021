@@ -1,19 +1,20 @@
 library(tidyverse)
 library(plyr)
 
-setwd("C:/Users/F112974/surfdrive/Onderzoek/CBS/audit_paper/simulatie")
+setwd("C:/Users/F112974/surfdrive/Onderzoek/CBS/audit_paper/simulatie_v1")
 
 load("datasets_WX.RData")
 load("distributions_WX.RData")
 
 results <- readRDS("results_WX.rds")
+results_dev <- readRDS("results_WX_dev.rds")
 
 n_conditions  = 4 #4
 n_iterations  = 1000 #1000
 n_results     = 9
 
 
-res_dev    <- vector(mode = "list", length = n_conditions)
+res_dev_WX    <- vector(mode = "list", length = n_conditions)
 
 res_biasW  <- vector(mode = "list", length = n_conditions)
 res_biasXW <- vector(mode = "list", length = n_conditions)
@@ -29,7 +30,7 @@ res_covXW  <- vector(mode = "list", length = n_conditions)
 
 for(i in 1:n_conditions){
   
-  res_dev[[i]]    <- matrix(NA, ncol = n_iterations, nrow = 1)
+  res_dev_WX[[i]]    <- matrix(NA, ncol = n_iterations, nrow = 1)
   
   res_biasW[[i]]  <- matrix(NA, ncol = n_iterations, nrow = 3)
   
@@ -53,7 +54,7 @@ for(i in 1:n_conditions){
   
   for(j in 1:n_iterations){
     
-    res_dev[[i]][,j]    <- results[[i]][[j]][[6]]
+    res_dev_WX[[i]][,j]    <- (results_dev[[i]][[j]][[1]] - results[[i]][[j]][[5]]) / results_dev[[i]][[j]][[1]]
     # absolute bias delen door 1 om 
     res_biasW[[i]][,j]  <- abs(popW[,"prob"] - results[[i]][[j]][[7]][,"prop"])  #/  popW[,"prob"]
     res_biasXW[[i]][,j] <- abs(popXW[,"prob"] - results[[i]][[j]][[8]][,"prop"]) #/  popXW[,"prob"]

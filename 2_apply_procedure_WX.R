@@ -42,6 +42,9 @@ for(i in 1:n_conditions){
     rtot <- aggregate(tab$freq, by = tab[ , c('X','Y')], FUN = sum)
     cst  <- 2 * sum(tot$x * log(tot$x), na.rm=TRUE) - 2 * sum(rtot$x * log(rtot$x), na.rm=TRUE)
     
+    tab$X = as.factor(tab$X)
+    tab$Y = as.factor(tab$Y)
+    
     # deviance independence model
     
     model_before <- fitmodel(model = 'freq ~ X*Y + Y*Z',
