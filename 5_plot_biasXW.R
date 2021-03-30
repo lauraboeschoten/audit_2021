@@ -39,9 +39,9 @@ res_XZ_biasXW <- matrix(NA, 1000, 4)
 
 for(i in 1:n_conditions){
   for(j in 1:n_iterations){
-    res_WX_biasXW[j,i] <- abs(results_WX[[i]][[j]][[8]][1,1] - pop_WX[i])
-    res_WY_biasXW[j,i] <- abs(results_WY[[i]][[j]][[8]][1,1] - pop_WY[i])
-    res_XZ_biasXW[j,i] <- abs(results_XZ[[i]][[j]][[8]][1,1] - pop_XZ[i])
+    res_WX_biasXW[j,i] <- results_WX[[i]][[j]][[8]][1,1] - pop_WX[i]
+    res_WY_biasXW[j,i] <- results_WY[[i]][[j]][[8]][1,1] - pop_WY[i]
+    res_XZ_biasXW[j,i] <- results_XZ[[i]][[j]][[8]][1,1] - pop_XZ[i]
   }
 }
 
@@ -59,8 +59,9 @@ data_plot_biasXW$biasXW  = c(res_WX_biasXW[,1:4],
 plot_biasW = ggplot(data_plot_biasXW, aes(x = factor(condition), y = biasXW)) +
   geom_boxplot(fill='#A4A4A4', color="black")+
   theme_classic() + 
-  labs(x="Condition", y="Absolute Bias")  +
-  ylim(0, 0.1) +
+  labs(x="Condition", y="Bias")  +
+  ylim(-.1, 0.1) +
+  geom_hline(yintercept=0) + 
   facet_grid(~study)
 
 ggsave("plot_biasXW.pdf")
@@ -94,7 +95,7 @@ res_ff_biasXW <- matrix(NA, n_iterations, n_conditions)
 
 for(i in 1:n_conditions){
   for(j in 1:n_iterations){
-    res_ff_biasXW[j,i] <- abs(results_ff[[i]][[j]][[8]][1,1] - pop_ff[i])
+    res_ff_biasXW[j,i] <- results_ff[[i]][[j]][[8]][1,1] - pop_ff[i]
     
   }
 }
@@ -119,8 +120,9 @@ data_plot_biasXW_ff$biasXW  = c(res_ff_biasXW[,1:8])
 plot_biasXW_ff = ggplot(data_plot_biasXW_ff, aes(x = factor(condition), y = biasXW)) +
   geom_boxplot(fill='#A4A4A4', color="black")+
   theme_classic() + 
-  labs(x="Condition", y="Absolute Bias") + 
-  ylim(0, 0.1) + 
+  labs(x="Condition", y="Bias") + 
+  ylim(-.1, 0.1) +
+  geom_hline(yintercept=0) + 
   theme(axis.text.x = element_text(angle=45))
 
 ggsave("plot_biasXW_ff.pdf")
