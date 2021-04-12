@@ -16,6 +16,10 @@ calculate the output that has been reported in the paper.
 
 5. The scripts '5_plot_....R' generate the boxplots that have been included in the manuscript
 
+Scripts with names that contain 'fixedpop' refer to the separate simulation study on variance estimation for finite populations.
+The numbering of these scripts follows the same logic as explained above. The script '0_test_variances_fixedpop.R' runs a separate
+simulation condition where the variance is estimated for an audit sample that is representative without applying the optimization procedure.
+
 The folder 'reproducible example' contains a simulated dataset and the functions needed to apply the audit sample selection procedure 
 on this dataset. This dataset can be used as an example of how to prepare your data and these functions can be used to apply the procedure
 to your own dataset. 
