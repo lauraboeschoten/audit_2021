@@ -16,7 +16,7 @@ calculate the output that has been reported in the paper.
 
 5. The scripts '5_plot_....R' generate the boxplots that have been included in the manuscript
 
-Scripts with names that contain 'fixedpop' refer to the separate simulation study on variance estimation for finite populations.
+Scripts with names that contain 'fixedpop' refer to a separate simulation study on variance estimation for finite populations.
 The numbering of these scripts follows the same logic as explained above. The script '0_test_variances_fixedpop.R' runs a separate
 simulation condition where the variance is estimated for an audit sample that is representative without applying the optimization procedure.
 
