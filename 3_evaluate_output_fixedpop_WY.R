@@ -9,8 +9,8 @@ load("distributions_fixedpop_WY.RData")
 
 results <- readRDS("results_fixedpop_WY.rds")
 
-n_conditions  = 5 #4
-n_iterations  = 1000 #1000
+n_conditions  = 4
+n_iterations  = 1000
 n_results     = 9
 
 
