@@ -16,8 +16,8 @@ source("2f_function_loglinear_model.R")
 source("2g_function_generate_W_for_audit.R")
 source("2h_function_proportionW_and_WX.R")
 
-n_conditions  = 5 #8
-n_iterations  = 1000 #1000
+n_conditions  = 4
+n_iterations  = 1000
 n_results     = 9
 
 results <- vector(mode = "list", length = n_conditions)
@@ -71,7 +71,7 @@ for(i in 1:n_conditions){
     
     seed = sum(i,j)
     set.seed(seed)
-    #set.seed(20200810 * 2)
+    
     for (s in 1:nrow(ex_nweg)) {
       cat(sprintf('Bepaal optimale toewijzing van %d extra eenheden en %d weglaten\n', 
                   ex_nweg[s,1], ex_nweg[s,1]*ex_nweg[s,2]))
