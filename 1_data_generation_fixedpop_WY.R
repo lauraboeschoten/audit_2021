@@ -5,7 +5,7 @@ setwd("F:/CBS_audit_2020-master")
 
 # number of conditions
 x_ncon = c(1)
-y_ncon = c(1, 2, 3, 4, 5)
+y_ncon = c(1, 2, 3, 4)
 z_ncon = c(1)
 
 conditions = list(x_ncon = x_ncon, y_ncon = y_ncon, z_ncon = z_ncon)
@@ -29,9 +29,6 @@ WY[[3]] = matrix(c(.9/3, .05/3, .05/3,
                    .15/3, .15/3, .7/3), nrow = 3, ncol = 3, byrow = TRUE)
 WY[[4]] = matrix(c(.8/3, .1/3, .1/3, 
                    .2/3, .6/3, .2/3,
-                   .3/3, .3/3, .4/3), nrow = 3, ncol = 3, byrow = TRUE)
-WY[[5]] = matrix(c(.4/3, .3/3, .3/3, 
-                   .3/3, .4/3, .3/3,
                    .3/3, .3/3, .4/3), nrow = 3, ncol = 3, byrow = TRUE)
 
 XZ = list()
