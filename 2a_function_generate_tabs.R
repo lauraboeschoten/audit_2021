@@ -39,6 +39,8 @@ preparetables <- function(data) {
                by = c('X', 'Y'),
                all.x = TRUE)
   tab <- tab[order(tab$Z, tab$Y, tab$X), ]
+  tab$X <- as.factor(tab$X)
+  tab$Y <- as.factor(tab$Y)
   
   colnames(tab) <- c("X","Y","Z","freq","rtot","ktot","tot","freq.pred","freqZ")
   
