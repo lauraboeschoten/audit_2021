@@ -136,6 +136,7 @@ for(i in 1:n_conditions){
     
     tab_extra[,"freqplus"] <- round(Freqsol, digits = 0)
     
+    set.seed(seed)
     tab_audit <- generate_W_for_audit(data, tab_extra)
     
     prop_list <- results_W_and_WX(tab_audit, tab_extra)
