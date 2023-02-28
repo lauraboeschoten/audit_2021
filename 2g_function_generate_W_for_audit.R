@@ -1,4 +1,6 @@
 
+library(extraDistr)
+
 generate_W_for_audit <- function(data, tab_extra) {
   
   # get results for W 
@@ -22,16 +24,14 @@ generate_W_for_audit <- function(data, tab_extra) {
     
     if (N_select > 0) {
       WYX_new[(1+((k-1)*3)):(3+((k-1)*3)), "freq"] <- data[data$X == X_select & data$Y == Y_select & data$Z == 1, 5] +
-        rmultinom(1, 
-                  N_select, # number of extra cases in audit
-                  data[data$X == X_select & data$Y == Y_select & data$Z == 2, 5]/ # W available in Z=2
-                    sum(data[data$X == X_select & data$Y == Y_select & data$Z == 2, 5]))
+        extraDistr::rmvhyper(nn = 1,
+                             n = data[data$X == X_select & data$Y == Y_select & data$Z == 2, 5], # W available in Z=2
+                             k = N_select) # number of extra cases in audit
     } else if (N_select < 0) {
       WYX_new[(1+((k-1)*3)):(3+((k-1)*3)), "freq"] <- data[data$X == X_select & data$Y == Y_select & data$Z == 1, 5] -
-        rmultinom(1, 
-                  abs(N_select), # number of cases to remove from audit
-                  data[data$X == X_select & data$Y == Y_select & data$Z == 1, 5]/ # W available in Z=1
-                    sum(data[data$X == X_select & data$Y == Y_select & data$Z == 1, 5]))
+        extraDistr::rmvhyper(nn = 1,
+                             n = data[data$X == X_select & data$Y == Y_select & data$Z == 1, 5], # W available in Z=1
+                             k = abs(N_select)) # number of cases to remove from audit
     } else { # N_select == 0
       WYX_new[(1+((k-1)*3)):(3+((k-1)*3)), "freq"] <- data[data$X == X_select & data$Y == Y_select & data$Z == 1, 5]
     }
