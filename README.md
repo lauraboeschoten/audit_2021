@@ -14,7 +14,7 @@ calculate the output that has been reported in the paper.
 
 4. The scripts '4_plot_output_....R' generate plots with results from the simulation output.
 
-5. The scripts '5_plot_....R' generate the boxplots that have been included in the manuscript
+5. The scripts '5_plot_....R' and '6_plot_....R' generate the boxplots that have been included in the manuscript
 
 Scripts with names that contain 'fixedpop' refer to a separate simulation study on variance estimation for finite populations.
 The numbering of these scripts follows the same logic as explained above. The script '0_test_variances_fixedpop.R' runs a separate
