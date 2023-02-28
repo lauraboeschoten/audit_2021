@@ -6,8 +6,6 @@ source("2c_function_prepare_startingvalues.R")
 source("2d_function_calculate_deviance.R")
 source("2e_function_calculate_gradient.R")
 source("2f_function_loglinear_model.R")
-source("2g_function_generate_W_for_audit.R")
-
 
 # Input: aggregated data-set with variables X,Y,Z
 # X: Target variable that is under inspection of audit
@@ -120,5 +118,3 @@ extra_toegewezen[s]             <- sum(oplossing$par[1:(sum(beschikbaar > 0))])
 extra_weggelaten[s]             <- sum(oplossing$par[-(1:(sum(beschikbaar > 0)))])
 
 tab_extra[,"freqplus"] <- round(Freqsol, digits = 0)
-
-tab_audit <- generate_W_for_audit(data, tab_extra)
